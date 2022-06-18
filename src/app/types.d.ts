@@ -5,4 +5,5 @@ interface ValueElement extends HTMLElement {
 	readonly: boolean;
 	clone(): ValueElement;
 	reset(): void;
+	readonly isValid: boolean;
 }
