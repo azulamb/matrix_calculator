@@ -1,0 +1,28 @@
+{
+	"tasks": {
+		"build_matrix": "tsc -p ./src/matrix",
+		"build_app": "tsc -p ./src/app",
+		"build": "deno task build_app & deno task build_matrix"
+	},
+	"lint": {
+		"files": {
+			"include": ["./src"]
+		},
+		"rules": {
+		  "tags": ["recommended"],
+		  "include": [],
+		  "exclude": ["require-await"]
+		}
+	},
+	"fmt": {
+		"files": {
+			"include": ["./src"]
+		},
+		"options": {
+			"useTabs": true,
+			"indentWidth": 4,
+			"lineWidth": 160,
+			"singleQuote": true
+		}
+	}
+}

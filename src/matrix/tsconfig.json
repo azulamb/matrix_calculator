@@ -1,0 +1,15 @@
+{
+	"compilerOptions": {
+		"outFile": "../../docs/matrix.js",
+		"module": "amd",
+		"target": "es2022",
+		"declaration": true,
+		"removeComments": true,
+		"strictNullChecks": true,
+		"noImplicitAny": true,
+		"sourceMap": false
+	},
+	"include": [
+		"./matrix.ts"
+	]
+}

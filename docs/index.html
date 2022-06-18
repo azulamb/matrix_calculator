@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>Matrix Calculator</title>
+<script src="./matrix.js"></script>
+<script src="./app.js"></script>
+<style>
+:root{--light-back:lightgray;}
+html{height:100%;font-size:5vmin;}
+body{height:100%;margin:0;display:grid;position:relative;overflow:hidden;grid-template-columns:8rem 1fr 1rem;grid-template-rows:1rem 1fr;grid-template-areas:"l i b" "l r r";}
+#list{grid-area:l;overflow:auto;}
+#formula{grid-area:i;}
+#calc{grid-area:b;}
+#calc::before{content:'▶';}
+#result{grid-area:r;overflow:auto;}
+input{font-size:1rem;}
+button{cursor:pointer;}
+#add{display:block;width:1.5rem;height:1.5rem;box-sizing:border-box;line-height:1.5rem;position:absolute;right:0.5rem;bottom:0.5rem;border-radius:50%;}
+#add::before{content:'+';font-size:1rem;}
+#select_matrix::before{content:'行列';}
+#select_vector::before{content:'ベクトル';}
+#create::before{content:'作成';}
+dialog{padding:0.2rem;border-radius:0.2rem;border:none;}
+dialog::backdrop{background-color:rgba(0,0,0,0.7);}
+dialog > div{display:grid;grid-template-rows:1rem 1fr 1rem;}
+dialog > div > div:first-child{display: grid;grid-template-columns:50% 50%;}
+dialog > div > div:first-child button{border:none;}
+dialog .contents{background:var(--light-back);padding:0.2rem;}
+dialog .contents *{display:none;}
+dialog:not(.vector) #select_matrix, dialog.vector #select_vector{background:var(--light-back);}
+dialog:not(.vector) .contents #matrix, dialog.vector .contents #vector{display:block;}
+</style>
+<script></script>
+</head>
+<body>
+	<div id="list"></div>
+	<input id="formula">
+	<button id="calc"></button>
+	<div id="result"></div>
+	<button id="add"></button>
+	<dialog id="add_modal">
+		<div>
+			<div>
+				<button id="select_matrix"></button>
+				<button id="select_vector"></button>
+			</div>
+			<div class="contents">
+				<matrix-value id="matrix"></matrix-value>
+				<vector-value id="vector"></matrix-value>
+			</div>
+			<button id="create"></button>
+		</div>
+	</dialog>
+</body>
+</html>
