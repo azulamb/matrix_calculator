@@ -14,6 +14,7 @@ interface OperatorNode {
 interface ValueNode {
 	type: 'value';
 	value: ValueElement;
+	inv: boolean;
 }
 type CalcNode = OperatorNode | ValueNode;
 Promise.all([
@@ -21,13 +22,28 @@ Promise.all([
 	customElements.whenDefined('vector-value'),
 	customElements.whenDefined('value-item'),
 ]).then(() => {
+	const baseValues: { [keys: string]: ValueElement } = {};
 	const list = <HTMLElement> document.getElementById('list');
 	const formula = <HTMLInputElement> document.getElementById('formula');
 	(<HTMLButtonElement> document.getElementById('calc')).addEventListener('click', () => {
-		const r = Calc(Parse(formula.value || '', GetValues()));
+		const f = formula.value || '';
+		const r = Calc(Parse(f, GetValues()));
 		const m = new (<{ new (): ValueElement }> customElements.get(r.length < 16 ? 'vector-value' : 'matrix-value'))();
 		m.value = r;
-		result.insertBefore(m, result.children[0] || null);
+
+		const key = `$${result.children.length + 1}`;
+		const header = document.createElement('div');
+		const area = document.createElement('div');
+		area.appendChild(header);
+		if (m.isValid) {
+			baseValues[key] = m;
+			header.textContent = `${key} = ${f}`;
+			area.appendChild(m);
+		} else {
+			header.textContent = `Invalid ... ${f}`;
+		}
+
+		result.insertBefore(area, result.children[0] || null);
 	});
 	const result = <HTMLElement> document.getElementById('result');
 	const modal = <HTMLDialogElement_> document.getElementById('add_modal');
@@ -58,7 +74,7 @@ Promise.all([
 		modal.showModal();
 	});
 	function GetValues() {
-		const values: { [keys: string]: ValueElement } = {};
+		const values = Object.assign(baseValues, {});
 		for (const item of list.children) {
 			const key = (<ValueItemElement> item).name;
 			if (key) {
@@ -74,12 +90,12 @@ Promise.all([
 			if (char.match(/\s/)) {
 				return;
 			}
-			if (char === '*') {
+			if (char === '*' || char === '^') {
 				if (tmp) {
 					token.push(tmp);
 				}
 				tmp = '';
-				token.push('*');
+				token.push(char);
 			} else {
 				tmp += char;
 			}
@@ -89,6 +105,7 @@ Promise.all([
 		}
 
 		let ast: CalcNode | undefined;
+		let inv: boolean = false;
 
 		for (const t of token) {
 			if (t === '*') {
@@ -98,12 +115,14 @@ Promise.all([
 				}
 				node.left = ast;
 				ast = node;
+			} else if (t === '^') {
+				inv = !inv;
 			} else {
 				const value = values[t];
 				if (!value) {
 					throw new Error(`Token error: Notfound value[${t}].`);
 				}
-				const node: ValueNode = { type: 'value', value: value };
+				const node: ValueNode = { type: 'value', value: value, inv: inv };
 				if (!ast) {
 					ast = node;
 				} else if (ast.type === 'multiple') {
@@ -111,6 +130,7 @@ Promise.all([
 				} else {
 					throw new Error(`Token error: ${t} position is invalid.`);
 				}
+				inv = false;
 			}
 		}
 
@@ -122,7 +142,7 @@ Promise.all([
 	}
 	function Calc(node: CalcNode): Float32Array {
 		if (node.type === 'value') {
-			return node.value.value;
+			return node.inv ? Matrix4.inverse4(node.value.value) : node.value.value;
 		}
 		if (!node.left || !node.right) {
 			throw new Error('Node error:');

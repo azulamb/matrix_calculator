@@ -73,6 +73,15 @@
 				value.value = '0';
 			}
 		}
+
+		get isValid() {
+			for (const v of this.values) {
+				if (isNaN(parseFloat(v.value))) {
+					return false;
+				}
+			}
+			return true;
+		}
 	}
 	((component, tagname = 'vector-value') => {
 		if (customElements.get(tagname)) {
